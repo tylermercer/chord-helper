@@ -28,7 +28,6 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-//  String _batteryLevel = "100";
   static const channel = const EventChannel("samples.flutter.dev/music");
   Stream music = channel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
 
