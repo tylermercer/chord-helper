@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -34,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    music = channel.receiveBroadcastStream().map<String>((e) => e as String);
+    music = channel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
   }
 
 //  Future<void> _getBatteryLevel() async {
@@ -61,12 +63,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            StreamBuilder<String>(
+            StreamBuilder<Map<String, dynamic>>(
               stream: music,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Text(
-                    snapshot.data,
+                    snapshot.data.values.join(", "),
                     style: Theme.of(context).textTheme.display1,
                   );
                 } else {

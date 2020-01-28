@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends FlutterActivity implements EventChannel.StreamHandler {
     private static final String CHANNEL = "samples.flutter.dev/music";
@@ -50,7 +51,7 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
                 data.put("album", intent.getStringExtra("album"));
                 data.put("track", intent.getStringExtra("track"));
 
-                events.success(data.get("track"));
+                events.success(stringMapToJson(data));
             }
         };
 
@@ -62,5 +63,22 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
         if (receiver == null) return;
         unregisterReceiver(receiver);
         receiver = null;
+    }
+
+    public String stringMapToJson(Map<String, String> map) {
+      StringBuilder result = new StringBuilder("{");
+
+      for (String key : map.keySet()) {
+          result.append("\"")
+                  .append(key)
+                  .append("\":\"")
+                  .append(map.get(key))
+                  .append("\",");
+      }
+
+      result.setLength(result.length() > 1 ? result.length() - 1 : 1);
+
+      result.append('}');
+      return result.toString();
     }
 }
