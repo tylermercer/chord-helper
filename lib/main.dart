@@ -45,10 +45,7 @@ class _MainPageState extends State<MainPage> {
               stream: music,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Text(
-                    snapshot.data.values.join(", "),
-                    style: Theme.of(context).textTheme.display1,
-                  );
+                  return Text(snapshot.data.values.join(", "));
                 } else {
                   return Text("No data");
                 }
