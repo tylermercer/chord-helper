@@ -10,15 +10,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends FlutterActivity implements EventChannel.StreamHandler {
-    private static final String CHANNEL = "samples.flutter.dev/music";
+    private static final String CHANNEL = "net.tylermercer.chordhelper/music";
 
     private BroadcastReceiver receiver = null;
 
@@ -38,13 +36,9 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
         iF.addAction("com.android.music.playbackcomplete");
         iF.addAction("com.android.music.queuechanged");
 
-        Log.d("FOOBAR", "listening for music events!!!");
-
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-
-                Log.d("FOOBAR", "received music event!!!");
 
                 HashMap<String, String> data = new HashMap<>();
                 data.put("artist", intent.getStringExtra("artist"));

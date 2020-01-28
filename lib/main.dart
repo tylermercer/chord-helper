@@ -28,7 +28,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  static const channel = const EventChannel("samples.flutter.dev/music");
+  static const channel = const EventChannel("net.tylermercer.chordhelper/music");
   Stream music = channel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
 
   @override
