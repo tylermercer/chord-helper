@@ -30,28 +30,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 //  String _batteryLevel = "100";
   static const channel = const EventChannel("samples.flutter.dev/music");
-  Stream music;
-
-
-  @override
-  void initState() {
-    super.initState();
-    music = channel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
-  }
-
-//  Future<void> _getBatteryLevel() async {
-//    String batteryLevel;
-//    try {
-//      final int result = await ;
-//      batteryLevel = 'Music info: $result %.';
-//    } on PlatformException catch (e) {
-//      batteryLevel = "Failed to get music info: '${e.message}'.";
-//    }
-//
-//    setState(() {
-//      _batteryLevel = batteryLevel;
-//    });
-//  }
+  Stream music = channel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
 
   @override
   Widget build(BuildContext context) {
