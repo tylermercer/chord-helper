@@ -10,23 +10,21 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.util.Log;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends FlutterActivity implements EventChannel.StreamHandler {
     private static final String CHANNEL = "net.tylermercer.chordhelper/music";
 
     private BroadcastReceiver receiver = null;
 
-  @Override
-  public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
-    GeneratedPluginRegistrant.registerWith(flutterEngine);
-    new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
-            .setStreamHandler(this);
-  }
-
+    @Override
+    public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
+        GeneratedPluginRegistrant.registerWith(flutterEngine);
+        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
+                .setStreamHandler(this);
+    }
 
     @Override
     public void onListen(Object arguments, EventChannel.EventSink events) {
@@ -40,12 +38,17 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
             @Override
             public void onReceive(Context context, Intent intent) {
 
-                HashMap<String, String> data = new HashMap<>();
-                data.put("artist", intent.getStringExtra("artist"));
-                data.put("album", intent.getStringExtra("album"));
-                data.put("track", intent.getStringExtra("track"));
+                JSONObject data = new JSONObject();
+                try {
+                    data.put("command", intent.getStringExtra("command"));
+                    data.put("artist", intent.getStringExtra("artist"));
+                    data.put("album", intent.getStringExtra("album"));
+                    data.put("track", intent.getStringExtra("track"));
+                    events.success(data.toString());
+                } catch (JSONException je) {
+                    events.error("UNAVAILABLE", "JSON Encoding Error", je.getMessage());
+                }
 
-                events.success(stringMapToJson(data));
             }
         };
 
@@ -57,22 +60,5 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
         if (receiver == null) return;
         unregisterReceiver(receiver);
         receiver = null;
-    }
-
-    public String stringMapToJson(Map<String, String> map) {
-      StringBuilder result = new StringBuilder("{");
-
-      for (String key : map.keySet()) {
-          result.append("\"")
-                  .append(key)
-                  .append("\":\"")
-                  .append(map.get(key))
-                  .append("\",");
-      }
-
-      result.setLength(result.length() > 1 ? result.length() - 1 : 1);
-
-      result.append('}');
-      return result.toString();
     }
 }
