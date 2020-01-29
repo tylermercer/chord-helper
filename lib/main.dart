@@ -42,7 +42,7 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    initIsPlaying();
+    stopIfPlaying();
 
     music.listen((data) {
       if (data['command'] == "") {
@@ -51,12 +51,8 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  void initIsPlaying() async {
+  void stopIfPlaying() async {
     methodChannel.invokeMethod("getMediaPlayState").then((playState) {
-      setState(() {
-        isPlaying = playState == "PLAYING";
-      });
-
       if (playState == "PLAYING") {
         methodChannel.invokeMethod("pauseMusic");
       }

@@ -12,6 +12,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -20,6 +21,7 @@ import org.json.JSONObject;
 public class MainActivity extends FlutterActivity implements EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
     private static final String EVENT_CHANNEL = "net.tylermercer.chordhelper/music";
     private static final String METHOD_CHANNEL = "net.tylermercer.chordhelper/control";
+    private AudioManager audioManager;
 
     private BroadcastReceiver receiver = null;
 
@@ -32,6 +34,8 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
 
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), METHOD_CHANNEL)
                 .setMethodCallHandler(this);
+
+        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
     }
 
     @Override
@@ -92,6 +96,7 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
 
     private void getMediaPlayState(Object arguments, @NonNull MethodChannel.Result result) {
         Log.d("MainActivity", "getMediaPlayState");
+        result.success(audioManager.isMusicActive() ? "PLAYING" : "PAUSED");
     }
 
     private void goToPreviousSong(Object arguments, @NonNull MethodChannel.Result result) {
@@ -104,6 +109,13 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
 
     private void pauseMusic(Object arguments, @NonNull MethodChannel.Result result) {
         Log.d("MainActivity", "pauseMusic");
+        if (audioManager.isMusicActive()) {
+
+            Intent i = new Intent("com.android.music.musicservicecommand");
+
+            i.putExtra("command", "pause");
+            MainActivity.this.sendBroadcast(i);
+        }
     }
 
     private void playMusic(Object arguments, @NonNull MethodChannel.Result result) {
