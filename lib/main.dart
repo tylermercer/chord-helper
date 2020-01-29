@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MainPage(title: 'Flutter Demo Home Page'),
+      home: MainPage(title: 'Chord Helper'),
     );
   }
 }
