@@ -33,7 +33,7 @@ class _MainPageState extends State<MainPage> {
   Stream music = eventChannel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
 
   static const methodChannel = const MethodChannel("net.tylermercer.chordhelper/control");
-  bool isPlaying = false;
+  bool _isPlaying = false;
   int exponent = 0;
 
   get multiplier => pow(2, exponent);
@@ -45,8 +45,10 @@ class _MainPageState extends State<MainPage> {
     stopIfPlaying();
 
     music.listen((data) {
-      if (data['command'] == "") {
-
+      if (data['playing'] != null) {
+        setState(() {
+          _isPlaying = data['playing'];
+        });
       }
     });
   }
@@ -129,7 +131,7 @@ class _MainPageState extends State<MainPage> {
                 stream: music,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return Text(snapshot.data.values.join(", "));
+                    return Text(snapshot.data['artist'] + ', ' + snapshot.data['album'] + ', ' + snapshot.data['track']);
                   } else {
                     return Text("No data");
                   }
@@ -146,21 +148,21 @@ class _MainPageState extends State<MainPage> {
                 IconButton(
                   iconSize: 40,
                   icon: Icon(Icons.skip_previous),
-                onPressed: () => methodChannel.invokeMethod("goToPreviousSong"),
+                onPressed: _previous,
                 ),
-                if (isPlaying) IconButton(
-                  iconSize: 40,
+                if (_isPlaying) IconButton(
+                  iconSize: 60,
                   icon: Icon(Icons.pause_circle_filled),
-                  onPressed: () => methodChannel.invokeMethod("pauseMusic"),
+                  onPressed: _pause,
                 ) else IconButton(
-                  iconSize: 40,
+                  iconSize: 60,
                   icon: Icon(Icons.play_circle_filled),
-                  onPressed: () => methodChannel.invokeMethod("playMusic"),
+                  onPressed: _play,
                 ),
                 IconButton(
                   iconSize: 40,
                   icon: Icon(Icons.skip_next),
-                  onPressed: () => methodChannel.invokeMethod("goToNextSong"),
+                  onPressed: _next,
                 ),
               ],
             ),
@@ -168,5 +170,21 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
     );
+  }
+
+  void _previous() {
+    methodChannel.invokeMethod("goToPreviousSong");
+  }
+
+  void _next() {
+    methodChannel.invokeMethod("goToNextSong");
+  }
+
+  void _play() {
+    methodChannel.invokeMethod("playMusic");
+  }
+
+  void _pause() {
+    methodChannel.invokeMethod("pauseMusic");
   }
 }

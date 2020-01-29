@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
-import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +51,7 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
 
                 JSONObject data = new JSONObject();
                 try {
-                    data.put("command", intent.getStringExtra("command"));
+                    data.put("playing", intent.getBooleanExtra("playing", true));
                     data.put("artist", intent.getStringExtra("artist"));
                     data.put("album", intent.getStringExtra("album"));
                     data.put("track", intent.getStringExtra("track"));
@@ -60,7 +59,6 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
                 } catch (JSONException je) {
                     events.error("UNAVAILABLE", "JSON Encoding Error", je.getMessage());
                 }
-
             }
         };
 
@@ -78,47 +76,25 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         switch (call.method) {
             case "playMusic":
-                playMusic(call.arguments, result);
+                issueMusicCommand("play");
                 break;
             case "pauseMusic":
-                pauseMusic(call.arguments, result);
+                issueMusicCommand("pause");
                 break;
             case "goToNextSong":
-                goToNextSong(call.arguments, result);
+                issueMusicCommand("next");
                 break;
             case "goToPreviousSong":
-                goToPreviousSong(call.arguments, result);
+                issueMusicCommand("previous");
                 break;
             case "getMediaPlayState":
-                getMediaPlayState(call.arguments, result);
+                result.success(audioManager.isMusicActive() ? "PLAYING" : "PAUSED");
         }
     }
 
-    private void getMediaPlayState(Object arguments, @NonNull MethodChannel.Result result) {
-        Log.d("MainActivity", "getMediaPlayState");
-        result.success(audioManager.isMusicActive() ? "PLAYING" : "PAUSED");
-    }
-
-    private void goToPreviousSong(Object arguments, @NonNull MethodChannel.Result result) {
-        Log.d("MainActivity", "goToPreviousSong");
-    }
-
-    private void goToNextSong(Object arguments, @NonNull MethodChannel.Result result) {
-        Log.d("MainActivity", "goToNextSong");
-    }
-
-    private void pauseMusic(Object arguments, @NonNull MethodChannel.Result result) {
-        Log.d("MainActivity", "pauseMusic");
-        if (audioManager.isMusicActive()) {
-
-            Intent i = new Intent("com.android.music.musicservicecommand");
-
-            i.putExtra("command", "pause");
-            MainActivity.this.sendBroadcast(i);
-        }
-    }
-
-    private void playMusic(Object arguments, @NonNull MethodChannel.Result result) {
-        Log.d("MainActivity", "playMusic");
+    private void issueMusicCommand(String command) {
+        Intent i = new Intent("com.android.music.musicservicecommand");
+        i.putExtra("command", command);
+        MainActivity.this.sendBroadcast(i);
     }
 }
