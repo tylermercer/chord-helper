@@ -4,26 +4,34 @@ import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends FlutterActivity implements EventChannel.StreamHandler {
-    private static final String CHANNEL = "net.tylermercer.chordhelper/music";
+public class MainActivity extends FlutterActivity implements EventChannel.StreamHandler, MethodChannel.MethodCallHandler {
+    private static final String EVENT_CHANNEL = "net.tylermercer.chordhelper/music";
+    private static final String METHOD_CHANNEL = "net.tylermercer.chordhelper/control";
 
     private BroadcastReceiver receiver = null;
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine);
-        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), CHANNEL)
+
+        new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EVENT_CHANNEL)
                 .setStreamHandler(this);
+
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), METHOD_CHANNEL)
+                .setMethodCallHandler(this);
     }
 
     @Override
@@ -60,5 +68,45 @@ public class MainActivity extends FlutterActivity implements EventChannel.Stream
         if (receiver == null) return;
         unregisterReceiver(receiver);
         receiver = null;
+    }
+
+    @Override
+    public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
+        switch (call.method) {
+            case "playMusic":
+                playMusic(call.arguments, result);
+                break;
+            case "pauseMusic":
+                pauseMusic(call.arguments, result);
+                break;
+            case "goToNextSong":
+                goToNextSong(call.arguments, result);
+                break;
+            case "goToPreviousSong":
+                goToPreviousSong(call.arguments, result);
+                break;
+            case "getMediaPlayState":
+                getMediaPlayState(call.arguments, result);
+        }
+    }
+
+    private void getMediaPlayState(Object arguments, @NonNull MethodChannel.Result result) {
+        Log.d("MainActivity", "getMediaPlayState");
+    }
+
+    private void goToPreviousSong(Object arguments, @NonNull MethodChannel.Result result) {
+        Log.d("MainActivity", "goToPreviousSong");
+    }
+
+    private void goToNextSong(Object arguments, @NonNull MethodChannel.Result result) {
+        Log.d("MainActivity", "goToNextSong");
+    }
+
+    private void pauseMusic(Object arguments, @NonNull MethodChannel.Result result) {
+        Log.d("MainActivity", "pauseMusic");
+    }
+
+    private void playMusic(Object arguments, @NonNull MethodChannel.Result result) {
+        Log.d("MainActivity", "playMusic");
     }
 }
