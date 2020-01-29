@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,6 +34,10 @@ class _MainPageState extends State<MainPage> {
 
   static const methodChannel = const MethodChannel("net.tylermercer.chordhelper/control");
   bool isPlaying = false;
+  int exponent = 0;
+
+  get multiplier => pow(2, exponent);
+  get multiplierString => exponent == 0 ? "" : (exponent >= 0 ? " (x$multiplier)" : " (x1/${pow(2, (exponent).abs())})");
 
   @override
   void initState() {
@@ -66,11 +71,51 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Column(
         children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(top: 4, bottom: 4),
+            color: Colors.grey[300],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                IconButton(
+                  iconSize: 40,
+                  icon: Icon(Icons.fast_rewind),
+                  onPressed: () {
+                    setState(() {
+                      exponent--;
+                    });
+                  },
+                ),
+                Row(
+                  children: [
+                    Text(
+                      "200 BPM",
+                      style: TextStyle(
+                        fontSize: 24,
+                      )
+                    ),
+                    if (multiplierString != "") Text(multiplierString)
+                  ]
+                ),
+                IconButton(
+                  iconSize: 40,
+                  icon: Icon(Icons.fast_forward),
+                  onPressed: () {
+                    setState(() {
+                      exponent++;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: Center(
               child: Text(
                 "A7",
-                style: Theme.of(context).textTheme.display4,
+                style: Theme.of(context).textTheme.display4.copyWith(
+                  fontSize: 140
+                ),
               ),
             ),
           ),
@@ -97,6 +142,7 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
           Container(
+            padding: EdgeInsets.only(bottom: 16),
             color: Colors.grey[300],
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
