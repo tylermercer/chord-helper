@@ -1,1 +1,1 @@
-var API_KEY = "put-your-key-here";
+const API_KEY = "BQCcX68e8etiuwpoi0hwyN0xYUUm9kT2XCusj6sKvKqya6dUaKFc0nqseW-sWRHDztwb9SEQjF_TbQcKJu4AW2NqxtnekSdkIaOmwWeSqH7t6SBw9_QrIOob90ryAoiq3FU1Br-7DrRTPdDd2035M3BW0Kg9MnI";
