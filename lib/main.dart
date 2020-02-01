@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_chord_helper/get_song_bpm.dart';
+import 'package:flutter_chord_helper/track_info.dart';
 
 void main() => runApp(MyApp());
 
@@ -30,7 +32,9 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   static const eventChannel = const EventChannel("net.tylermercer.chordhelper/music");
-  Stream music = eventChannel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
+  Stream<Map<String, dynamic>> rawMusicInfo = eventChannel.receiveBroadcastStream().map<Map<String, dynamic>>((e) => jsonDecode(e as String));
+  Stream<TrackInfo> musicInfo;
+  Stream<int> musicBpm;
 
   static const methodChannel = const MethodChannel("net.tylermercer.chordhelper/control");
   bool _isPlaying = false;
@@ -41,10 +45,13 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
-    super.initState();
-    stopIfPlaying();
+    musicInfo = rawMusicInfo.map<TrackInfo>((data) => TrackInfo.fromMap(data));
+    musicBpm = musicInfo.asyncMap<int>((info) => getBpmFromTrackInfo(info));
 
-    music.listen((data) {
+    super.initState();
+    getCurrentSongInfo();
+
+    rawMusicInfo.listen((data) {
       if (data['playing'] != null) {
         setState(() {
           _isPlaying = data['playing'];
@@ -53,9 +60,13 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  void stopIfPlaying() async {
+  void getCurrentSongInfo() async {
     methodChannel.invokeMethod("getMediaPlayState").then((playState) {
       if (playState == "PLAYING") {
+        methodChannel.invokeMethod("pauseMusic");
+        methodChannel.invokeMethod("playMusic");
+      } else {
+        methodChannel.invokeMethod("playMusic");
         methodChannel.invokeMethod("pauseMusic");
       }
     });
@@ -86,11 +97,20 @@ class _MainPageState extends State<MainPage> {
                 ),
                 Row(
                   children: [
-                    Text(
-                      "200 BPM",
-                      style: TextStyle(
-                        fontSize: 24,
-                      )
+                    StreamBuilder<int>(
+                      stream: musicBpm,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(
+                            "${snapshot.data} BPM",
+                            style: TextStyle(
+                              fontSize: 24,
+                            )
+                          );
+                        } else {
+                          return Text("Loading...");
+                        }
+                      }
                     ),
                     if (multiplierString != "") Text(multiplierString)
                   ]
@@ -127,11 +147,11 @@ class _MainPageState extends State<MainPage> {
 
                 )
               ),
-              child: StreamBuilder<Map<String, dynamic>>(
-                stream: music,
+              child: StreamBuilder<TrackInfo>(
+                stream: musicInfo,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return Text(snapshot.data['artist'] + ', ' + snapshot.data['album'] + ', ' + snapshot.data['track']);
+                    return Text(snapshot.data.toString());
                   } else {
                     return Text("No data");
                   }

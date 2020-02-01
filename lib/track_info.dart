@@ -9,4 +9,6 @@ class TrackInfo {
       this.name = map['track'],
       this.album = map['album'],
       this.artist = map['artist'];
+
+  String toString() => '${this.artist} / ${this.album} / ${this.name}';
 }
