@@ -28,10 +28,8 @@ Future<String> _getTrackId(TrackInfo trackInfo) async {
       }
   );
 
-  debugPrint(response.body);
-
   Map<String, dynamic> decoded = jsonDecode(response.body);
-  
+
   return decoded['tracks']['items'][0]['id'];
 }
 
@@ -46,8 +44,6 @@ Future<int> _getBpmFromTrackId(String id) async {
         "Authorization": "Bearer $API_KEY"
       }
   );
-
-  debugPrint(response.body);
 
   var object = jsonDecode(response.body);
 
