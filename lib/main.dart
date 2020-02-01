@@ -151,7 +151,15 @@ class _MainPageState extends State<MainPage> {
                 stream: musicInfo,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return Text(snapshot.data.toString());
+                    return Column(
+                      children: <Widget>[
+                        Text(snapshot.data.artist + " - " + snapshot.data.album, style: Theme.of(context).textTheme.caption),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6.0),
+                          child: Text(snapshot.data.name, style: Theme.of(context).textTheme.body2),
+                        ),
+                      ],
+                    );
                   } else {
                     return Text("No data");
                   }
