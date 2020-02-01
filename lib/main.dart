@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chord_helper/get_song_bpm.dart';
 import 'package:flutter_chord_helper/track_info.dart';
 
+import 'bpm_bar.dart';
 import 'media_controls_bar.dart';
 
 void main() => runApp(MyApp());
@@ -43,7 +44,6 @@ class _MainPageState extends State<MainPage> {
   int exponent = 0;
 
   get multiplier => pow(2, exponent);
-  get multiplierString => exponent == 0 ? "" : (exponent >= 0 ? " (x$multiplier)" : " (x1/${pow(2, (exponent).abs())})");
 
   @override
   void initState() {
@@ -82,7 +82,25 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Column(
         children: <Widget>[
-          _buildBpmBar(),
+          StreamBuilder<int>(
+            stream: musicBpm,
+            builder: (context, snapshot) {
+              return BpmBar(
+                onSlowDown: () {
+                  setState(() {
+                    exponent--;
+                  });
+                },
+                onSpeedUp: () {
+                  setState(() {
+                    exponent++;
+                  });
+                },
+                exponent: exponent,
+                bpm: snapshot.hasData? snapshot.data : null,
+              );
+            }
+          ),
           Expanded(
             child: Center(
               child: Text(
@@ -101,56 +119,6 @@ class _MainPageState extends State<MainPage> {
             onNext: () => methodChannel.invokeMethod("goToNextSong"),
             musicInfo: musicInfo,
           )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBpmBar() {
-    return Container(
-      padding: EdgeInsets.only(top: 4, bottom: 4),
-      color: Colors.grey[300],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          IconButton(
-            iconSize: 40,
-            icon: Icon(Icons.fast_rewind),
-            onPressed: () {
-              setState(() {
-                exponent--;
-              });
-            },
-          ),
-          Row(
-              children: [
-                StreamBuilder<int>(
-                    stream: musicBpm,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return Text(
-                            "${snapshot.data} BPM",
-                            style: TextStyle(
-                              fontSize: 24,
-                            )
-                        );
-                      } else {
-                        return Text("Loading...");
-                      }
-                    }
-                ),
-                if (multiplierString != "") Text(multiplierString)
-              ]
-          ),
-          IconButton(
-            iconSize: 40,
-            icon: Icon(Icons.fast_forward),
-            onPressed: () {
-              setState(() {
-                exponent++;
-              });
-            },
-          ),
         ],
       ),
     );
