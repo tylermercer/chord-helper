@@ -47,7 +47,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
-    musicInfo = rawMusicInfo.map<TrackInfo>((data) => TrackInfo.fromMap(data));
+    musicInfo = rawMusicInfo.map<TrackInfo>((data) => TrackInfo.fromMap(data)).distinct();
     musicBpm = musicInfo.asyncMap<int>((info) => getBpmFromTrackInfo(info));
 
     super.initState();
