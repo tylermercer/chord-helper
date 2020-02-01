@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_chord_helper/get_song_bpm.dart';
 import 'package:flutter_chord_helper/track_info.dart';
 
+import 'media_controls_bar.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -80,53 +82,7 @@ class _MainPageState extends State<MainPage> {
       ),
       body: Column(
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.only(top: 4, bottom: 4),
-            color: Colors.grey[300],
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                IconButton(
-                  iconSize: 40,
-                  icon: Icon(Icons.fast_rewind),
-                  onPressed: () {
-                    setState(() {
-                      exponent--;
-                    });
-                  },
-                ),
-                Row(
-                  children: [
-                    StreamBuilder<int>(
-                      stream: musicBpm,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(
-                            "${snapshot.data} BPM",
-                            style: TextStyle(
-                              fontSize: 24,
-                            )
-                          );
-                        } else {
-                          return Text("Loading...");
-                        }
-                      }
-                    ),
-                    if (multiplierString != "") Text(multiplierString)
-                  ]
-                ),
-                IconButton(
-                  iconSize: 40,
-                  icon: Icon(Icons.fast_forward),
-                  onPressed: () {
-                    setState(() {
-                      exponent++;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
+          _buildBpmBar(),
           Expanded(
             child: Center(
               child: Text(
@@ -137,82 +93,66 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
           ),
-          Container(
-            color: Colors.grey[300],
-            padding: EdgeInsets.all(16),
-            alignment: Alignment(0,0),
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                primaryTextTheme: TextTheme(
-
-                )
-              ),
-              child: StreamBuilder<TrackInfo>(
-                stream: musicInfo,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: <Widget>[
-                        Text(snapshot.data.artist + " - " + snapshot.data.album, style: Theme.of(context).textTheme.caption),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6.0),
-                          child: Text(snapshot.data.name, style: Theme.of(context).textTheme.body2),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Text("No data");
-                  }
-                }
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.only(bottom: 16),
-            color: Colors.grey[300],
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                IconButton(
-                  iconSize: 40,
-                  icon: Icon(Icons.skip_previous),
-                onPressed: _previous,
-                ),
-                if (_isPlaying) IconButton(
-                  iconSize: 60,
-                  icon: Icon(Icons.pause_circle_filled),
-                  onPressed: _pause,
-                ) else IconButton(
-                  iconSize: 60,
-                  icon: Icon(Icons.play_circle_filled),
-                  onPressed: _play,
-                ),
-                IconButton(
-                  iconSize: 40,
-                  icon: Icon(Icons.skip_next),
-                  onPressed: _next,
-                ),
-              ],
-            ),
+          MediaControlsBar(
+            isPlaying: _isPlaying,
+            onPrevious: () => methodChannel.invokeMethod("goToPreviousSong"),
+            onPlay: () => methodChannel.invokeMethod("playMusic"),
+            onPause: () => methodChannel.invokeMethod("pauseMusic"),
+            onNext: () => methodChannel.invokeMethod("goToNextSong"),
+            musicInfo: musicInfo,
           )
         ],
       ),
     );
   }
 
-  void _previous() {
-    methodChannel.invokeMethod("goToPreviousSong");
-  }
-
-  void _next() {
-    methodChannel.invokeMethod("goToNextSong");
-  }
-
-  void _play() {
-    methodChannel.invokeMethod("playMusic");
-  }
-
-  void _pause() {
-    methodChannel.invokeMethod("pauseMusic");
+  Widget _buildBpmBar() {
+    return Container(
+      padding: EdgeInsets.only(top: 4, bottom: 4),
+      color: Colors.grey[300],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          IconButton(
+            iconSize: 40,
+            icon: Icon(Icons.fast_rewind),
+            onPressed: () {
+              setState(() {
+                exponent--;
+              });
+            },
+          ),
+          Row(
+              children: [
+                StreamBuilder<int>(
+                    stream: musicBpm,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                            "${snapshot.data} BPM",
+                            style: TextStyle(
+                              fontSize: 24,
+                            )
+                        );
+                      } else {
+                        return Text("Loading...");
+                      }
+                    }
+                ),
+                if (multiplierString != "") Text(multiplierString)
+              ]
+          ),
+          IconButton(
+            iconSize: 40,
+            icon: Icon(Icons.fast_forward),
+            onPressed: () {
+              setState(() {
+                exponent++;
+              });
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
