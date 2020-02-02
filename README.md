@@ -1,5 +1,5 @@
 # Chord Helper
 
-This is a small open-source Android application designed to help with practicing guitar chord changes. It uses BPM data from [GetSongBPM](getsongbpm.com). 
+This is a small open-source Android application designed to help with practicing guitar chord changes. It uses BPM data from Spotify's public API. To acquire a temporary token for this API, it makes a request to https://spotify-web-api-token.herokuapp.com/token.
 
-The GetSongBPM API key is not stored in this repo. If you want to fork this project and run it on your own device, you must put your own key in `lib/API_KEY.dart`.
+TO-DO: Add buttons for selecting keys to practice, rather than shuffling the entire list of chords.
