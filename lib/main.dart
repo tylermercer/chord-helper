@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_chord_helper/get_song_bpm.dart';
+import 'package:flutter_chord_helper/spotify_web_api.dart';
 import 'package:flutter_chord_helper/track_info.dart';
 
 import 'bpm_bar.dart';
