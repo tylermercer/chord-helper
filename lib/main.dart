@@ -39,6 +39,8 @@ class _MainPageState extends State<MainPage> {
   Stream<TrackInfo> musicInfo;
   Stream<int> musicBpm;
 
+  SpotifyWebApi api = new SpotifyWebApi();
+
   static const methodChannel = const MethodChannel("net.tylermercer.chordhelper/control");
   bool _isPlaying = false;
   int exponent = 0;
@@ -47,8 +49,10 @@ class _MainPageState extends State<MainPage> {
 
   @override
   void initState() {
+    api.refreshToken();
+
     musicInfo = rawMusicInfo.map<TrackInfo>((data) => TrackInfo.fromMap(data)).distinct();
-    musicBpm = musicInfo.asyncMap<int>((info) => getBpmFromTrackInfo(info));
+    musicBpm = musicInfo.asyncMap<int>((info) => api.getBpmFromTrackInfo(info));
 
     super.initState();
     getCurrentSongInfo();
