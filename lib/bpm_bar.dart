@@ -27,15 +27,17 @@ class BpmBar extends StatelessWidget {
             onPressed: onSlowDown,
           ),
           Row(
-              children: [
+            children: [
+              if (bpm != null)
                 Text(
-                    "${bpm == null ? "Loading..." : bpm} BPM",
-                    style: TextStyle(
-                      fontSize: 24,
-                    )
+                  "$bpm BPM",
+                  style: TextStyle(
+                    fontSize: 24,
+                  )
                 ),
-                if (multiplierString != "") Text(multiplierString)
-              ]
+              if (bpm == null) Text("Loading..."),
+              if (multiplierString != "") Text(multiplierString)
+            ]
           ),
           IconButton(
             iconSize: 40,
