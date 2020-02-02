@@ -2,54 +2,79 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-import 'API_KEY.dart';
 import 'track_info.dart';
 
 import 'package:http/http.dart' as http;
 
-Future<int> getBpmFromTrackInfo(TrackInfo trackInfo) async {
-  String id = await _getTrackId(trackInfo);
-  return _getBpmFromTrackId(id);
-}
+class SpotifyWebApi {
+  static const String _baseUri = "https://api.spotify.com/v1";
+  static const _baseTokenUri = "https://spotify-web-api-token.herokuapp.com/token";
+  Future<String> accessToken;
 
-Future<String> _getTrackId(TrackInfo trackInfo) async {
-  var query = {
-    'q' : '${trackInfo.artist} ${trackInfo.name}',
-    'type' : 'track',
-    'limit' : '1'
-  };
-  var url = "https://api.spotify.com/v1/search?${_encodeMap(query)}";
+  void refreshToken() async {
+    accessToken = getToken();
+  }
 
-  var response = await http.get(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $API_KEY"
-      }
-  );
+  Future<String> getToken() async {
+    debugPrint("Getting token");
+    var response = await http.get(_baseTokenUri);
+    var decoded = jsonDecode(response.body);
+    debugPrint("Got token: ${response.body}");
+    return decoded['token'];
+  }
 
-  Map<String, dynamic> decoded = jsonDecode(response.body);
+  Future<int> getBpmFromTrackInfo(TrackInfo trackInfo) async {
+    String id = await _getTrackId(trackInfo);
+    return getBpmFromTrackId(id);
+  }
 
-  return decoded['tracks']['items'][0]['id'];
-}
+  Future<int> getBpmFromTrackId(String id) async {
+    var url = "$_baseUri/audio-features/$id";
 
+    debugPrint("Getting bpm");
+    var response = await http.get(
+        url,
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer ${await accessToken}"
+        }
+    );
 
-Future<int> _getBpmFromTrackId(String id) async {
-  var url = "https://api.spotify.com/v1/audio-features/$id";
+    var decoded = jsonDecode(response.body);
+    debugPrint("Got bpm: ${response.body}");
+    return (decoded['tempo'] as double).round();
+  }
 
-  var response = await http.get(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $API_KEY"
-      }
-  );
+  Future<String> _getTrackId(TrackInfo trackInfo) async {
+    var query = {
+      'q': '${trackInfo.artist} ${trackInfo.name}',
+      'type': 'track',
+      'limit': '1'
+    };
+    var url = "$_baseUri/search?${_encodeMap(query)}";
 
-  var object = jsonDecode(response.body);
+    debugPrint("Getting track id");
+    var response = await http.get(
+        url,
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer ${await accessToken}"
+        }
+    );
 
-  return (object['tempo'] as double).round();
-}
+    Map<String, dynamic> decoded = jsonDecode(response.body);
 
-String _encodeMap(Map data) {
-  return data.keys.map((key) => "$key=${data[key]}").join("&").replaceAll(" ", "+");
+    debugPrint("Got track id: ${response.body}");
+    var tracks = decoded['tracks'];
+    if (tracks == null) return null;
+    var items = tracks['items'];
+    if (items == null) return null;
+    var item0 = items[0];
+    if (item0 == null) return null;
+    return item0['id'];
+  }
+
+  String _encodeMap(Map data) {
+    return data.keys.map((key) => "$key=${data[key]}").join("&").replaceAll(" ", "+");
+  }
 }

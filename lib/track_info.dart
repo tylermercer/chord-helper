@@ -11,4 +11,19 @@ class TrackInfo {
       this.artist = map['artist'];
 
   String toString() => '${this.artist} / ${this.album} / ${this.name}';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is TrackInfo &&
+              runtimeType == other.runtimeType &&
+              name == other.name &&
+              album == other.album &&
+              artist == other.artist;
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      album.hashCode ^
+      artist.hashCode;
 }
