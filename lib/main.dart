@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_chord_helper/chord_flipper.dart';
 import 'package:flutter_chord_helper/spotify_web_api.dart';
 import 'package:flutter_chord_helper/track_info.dart';
 
@@ -45,7 +46,7 @@ class _MainPageState extends State<MainPage> {
   bool _isPlaying = false;
   int exponent = 0;
 
-  get multiplier => pow(2, exponent);
+  double get multiplier => pow(2, exponent) * 1.0;
 
   @override
   void initState() {
@@ -106,13 +107,18 @@ class _MainPageState extends State<MainPage> {
             }
           ),
           Expanded(
-            child: Center(
-              child: Text(
-                "A7",
-                style: Theme.of(context).textTheme.display4.copyWith(
-                  fontSize: 140
-                ),
-              ),
+            child: StreamBuilder<int>(
+              stream: musicBpm,
+              builder: (context, snapshot) {
+                if (snapshot.hasData)
+                  return ChordFlipper(
+                    bpm: snapshot.data,
+                    multiplier: multiplier,
+                    isPaused: !_isPlaying,
+                  );
+                else
+                  return Center(child: CircularProgressIndicator());
+              },
             ),
           ),
           MediaControlsBar(
