@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chord_helper/chord_flipper.dart';
+import 'package:flutter_chord_helper/keys.dart';
 import 'package:flutter_chord_helper/spotify_web_api.dart';
 import 'package:flutter_chord_helper/track_info.dart';
 
@@ -44,9 +45,11 @@ class _MainPageState extends State<MainPage> {
 
   static const methodChannel = const MethodChannel("net.tylermercer.chordhelper/control");
   bool _isPlaying = false;
-  int exponent = 0;
+  int exponent = -2;
 
   double get multiplier => pow(2, exponent) * 1.0;
+
+  MusicalKey key = keys[0];
 
   @override
   void initState() {
@@ -115,11 +118,20 @@ class _MainPageState extends State<MainPage> {
                     bpm: snapshot.data,
                     multiplier: multiplier,
                     isPaused: !_isPlaying,
+                    musicalKey: key
                   );
                 else
                   return Center(child: CircularProgressIndicator());
               },
             ),
+          ),
+          DropdownButton<MusicalKey>(
+            value: key,
+            items: keys.map((k) => DropdownMenuItem(
+              value: k,
+              child: Text(k.name),
+            )).toList(),
+            onChanged: _keySelected,
           ),
           MediaControlsBar(
             isPlaying: _isPlaying,
@@ -132,5 +144,11 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
     );
+  }
+
+  void _keySelected(MusicalKey selected) {
+    this.setState(() {
+      this.key = selected;
+    });
   }
 }
