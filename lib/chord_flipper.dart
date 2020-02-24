@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'keys.dart';
+import 'chord_sets.dart';
 
 class ChordFlipper extends StatefulWidget {
   final int bpm;
   final double multiplier;
   final bool isPaused;
-  final MusicalKey musicalKey;
+  final ChordSet musicalKey;
 
   const ChordFlipper({Key key, this.bpm, this.multiplier, this.isPaused, this.musicalKey}) : super(key: key);
 
@@ -49,7 +49,7 @@ class _ChordFlipperState extends State<ChordFlipper> {
   }
 
   void _initChordsList() {
-    _chords = widget.musicalKey.toWeightedShuffledChordList();
+    _chords = widget.musicalKey.toWeightedChordList();
   }
 
   @override

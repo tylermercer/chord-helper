@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chord_helper/chord_flipper.dart';
-import 'package:flutter_chord_helper/keys.dart';
+import 'package:flutter_chord_helper/chord_sets.dart';
 import 'package:flutter_chord_helper/spotify_web_api.dart';
 import 'package:flutter_chord_helper/track_info.dart';
 
@@ -49,7 +49,7 @@ class _MainPageState extends State<MainPage> {
 
   double get multiplier => pow(2, exponent) * 1.0;
 
-  MusicalKey key = keys[0];
+  ChordSet key = keys[0];
 
   @override
   void initState() {
@@ -125,7 +125,7 @@ class _MainPageState extends State<MainPage> {
               },
             ),
           ),
-          DropdownButton<MusicalKey>(
+          DropdownButton<ChordSet>(
             value: key,
             items: keys.map((k) => DropdownMenuItem(
               value: k,
@@ -146,7 +146,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  void _keySelected(MusicalKey selected) {
+  void _keySelected(ChordSet selected) {
     this.setState(() {
       this.key = selected;
     });

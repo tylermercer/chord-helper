@@ -1,14 +1,13 @@
-import 'package:flutter/material.dart';
-
-class MusicalKey {
+class ChordSet {
   final String name;
   final List<String> primaryChords;
   final List<String> additionalChords;
+  final bool shuffle;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is MusicalKey &&
+          other is ChordSet &&
               runtimeType == other.runtimeType &&
               name == other.name &&
               primaryChords == other.primaryChords &&
@@ -20,27 +19,27 @@ class MusicalKey {
       primaryChords.hashCode ^
       additionalChords.hashCode;
 
-  MusicalKey({this.name, this.primaryChords, this.additionalChords});
+  ChordSet({this.name, this.primaryChords, this.additionalChords, this.shuffle = true});
 
-  List<String> toWeightedShuffledChordList() {
+  List<String> toWeightedChordList() {
     List<String> res = [];
     if (this.additionalChords.length > 0) {
       List<String> primary = List.from(primaryChords);
       for (var chord in this.additionalChords) {
-        primary.shuffle();
+        if (shuffle) primary.shuffle();
         res.addAll(primary);
         res.add(chord);
       }
     } else {
       res.addAll(primaryChords);
-      res.shuffle();
+      if (shuffle) res.shuffle();
     }
     return res;
   }
 }
 
-List<MusicalKey> keys = [
-  MusicalKey(
+List<ChordSet> keys = [
+  ChordSet(
     name: "D Major",
     primaryChords: [
       "D",
@@ -55,7 +54,7 @@ List<MusicalKey> keys = [
       "Dm",
     ]
   ),
-  MusicalKey(
+  ChordSet(
     name: "G Major",
     primaryChords: [
       "G",
@@ -70,7 +69,7 @@ List<MusicalKey> keys = [
       "D",
     ]
   ),
-  MusicalKey(
+  ChordSet(
     name: "C Major",
     primaryChords: [
       "C",
@@ -82,7 +81,7 @@ List<MusicalKey> keys = [
       "Dm"
     ]
   ),
-  MusicalKey(
+  ChordSet(
     name: "A Major",
     primaryChords: [
       "A",
@@ -93,7 +92,7 @@ List<MusicalKey> keys = [
       "B7",
     ]
   ),
-  MusicalKey(
+  ChordSet(
     name: "E Major",
     primaryChords: [
       "E",
@@ -101,7 +100,7 @@ List<MusicalKey> keys = [
       "B7",
     ],
   ),
-  MusicalKey(
+  ChordSet(
     name: "E Minor",
     primaryChords: [
       "Em",
@@ -109,12 +108,12 @@ List<MusicalKey> keys = [
       "B7"
     ]
   ),
-  MusicalKey(
+  ChordSet(
     name: "A Minor",
     primaryChords: [
       "Am",
       "Dm",
       "E7"
     ]
-  )
+  ),
 ];
