@@ -116,4 +116,57 @@ List<ChordSet> keys = [
       "E7"
     ]
   ),
+  ChordSet(
+    name: "One Foot",
+    primaryChords: [
+      "Am",
+      "F",
+      "C",
+      "G"
+    ],
+    shuffle: false
+  ),
+  ChordSet(
+    name: "Safe and Sound",
+    primaryChords: [
+      "F",
+      "C",
+      "Am",
+      "G"
+    ],
+    shuffle: false
+  ),
+  ChordSet(
+    name: "Oh My Stars",
+    primaryChords: [
+      "C",
+      "Em",
+      "Am",
+      "G",
+    ],
+    additionalChords: [
+      "F"
+    ],
+    shuffle: false
+  ),
+  ChordSet(
+    name: "Graduate",
+    primaryChords: [
+      "C",
+      "G",
+      "D"
+    ]
+  ),
+  ChordSet(
+    name: "Something Just Like This",
+    primaryChords: [
+      "G",
+      "A",
+      "Bm",
+      "D"
+    ],
+    additionalChords: [
+      "F#m"
+    ]
+  ),
 ];
