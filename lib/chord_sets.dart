@@ -26,7 +26,10 @@ class ChordSet {
     if (this.additionalChords.length > 0) {
       List<String> primary = List.from(primaryChords);
       for (var chord in this.additionalChords) {
-        if (shuffle) primary.shuffle();
+        if (shuffle)
+          primary.shuffle();
+        else //When not shuffled, add the primary list twice so that it's practiced in sequence
+          res.addAll(primary);
         res.addAll(primary);
         res.add(chord);
       }
